@@ -50,7 +50,7 @@ def spread_fire(temp_self, k, coords):
             if np.random.rand() < prob_spread:
                 try:
                     if check_grid[x_coord+i, y_coord+j]==0:
-                        temp_grid[x_coord+i, y_coord+j] = np.random.normal(450,50)
+                        temp_grid[x_coord+i, y_coord+j] =500
                         check_grid[x_coord+i, y_coord+j]=1
                 except IndexError: pass
 
