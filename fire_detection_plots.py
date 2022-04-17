@@ -6,7 +6,8 @@ Running simulations and plotting
 
 @author: hills
 """
-
+import os
+os.chdir(__file__[:-23]) # put the things in the same directory to make sure no weirdness with the importing
 from fire_funcs import *
 import numpy as np
 import matplotlib.pyplot as plt

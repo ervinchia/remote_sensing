@@ -15,7 +15,7 @@ temp_bg = 32.123
 temp_grid = np.full((100,100),temp_bg)
 bmass_grid = np.random.uniform(0,1,(100,100))
 check_grid = np.zeros((100,100))
-N_frames = input('Number of frames for simulation? ')
+N_frames = int(input('Number of frames for simulation? '))
 
 def temp_curve(temp_0, tpeak, burn_time):
     """ Returns the temperature evolution curve for all time, needs params to control peak temp and how long it burns for """
@@ -56,7 +56,7 @@ def spread_fire(temp_self, k, coords):
 
     return temp_grid
 
-def start_sim():
+def start_sim(temp_grid = temp_grid):
   """ Starts simulation """
   temp_grid[50,50] = 500 # seed with fire, temperature = 500 celsius
 
