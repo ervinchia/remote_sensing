@@ -1,10 +1,12 @@
 from array import array
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 h = 6.626E-34
 c = 299792458
 k = 1.38E-23
 sigma = 5.67E-8
+matplotlib.use('TKAgg')
 
 def renorm(Temp:float, lda:float) -> float:
     '''
@@ -26,18 +28,21 @@ def shortwave(x:float)-> float:
     g = 15/(np.pi**4) * (np.exp(-1*x)*(x**3+3*x**2+6*x+6) + (np.exp(-2*x)/8)*(4*x**3+6*x**2+6*x+3)) 
     return(g)
 
-def planck_estimate(x_1:float, x_2:float, temp:float, propagate:bool = True, attenuate:int = 4, xflip:float = 2.25)-> float:
+def planck_estimate(x_1:float, x_2:float, temp:float, propagate:bool = True, attenuate:int = 4, xflip:float = 2.25, legacy:bool = True)-> float:
     '''
     Uses `shortwave` and `longwave` approximation function to yield the estimated blackbody radiance over `x_2` and `x_1` at temperature `temp`.
     `attenuate` takes either `4` or `11` microns, which attenuates the radiance at that wavelength.
     '''
-    if type(x_1) == float:
-        if max(x_1, x_2) <= xflip:
-            m = sigma*(temp**4)*(longwave(x_2) - longwave(x_1))
+    if legacy == False:
+        if type(x_1) == float:
+            if max(x_1, x_2) <= xflip:
+                m = sigma*(temp**4)*(longwave(x_2) - longwave(x_1))
+            else:
+                m = sigma*(temp**4)*(shortwave(x_2) - shortwave(x_1))
         else:
-            m = sigma*(temp**4)*(shortwave(x_2) - shortwave(x_1))
+            m=np.where(x_2 <= xflip, sigma*(temp**4)*(longwave(x_1)-longwave(x_2)), sigma*(temp**4)*(shortwave(x_2)-shortwave(x_1)))
     else:
-        m=np.where(x_2 <= xflip, sigma*(temp**4)*(longwave(x_1)-longwave(x_2)), sigma*(temp**4)*(shortwave(x_2)-shortwave(x_1)))
+        m= sigma*(temp**4)*(shortwave(x_2) - shortwave(x_1))
     if attenuate == 4:
         m = 0.98*m
     elif attenuate == 11:
@@ -95,37 +100,40 @@ def totalfinder(tempgrid:np.ndarray, bandwidth = 1E-7, wllist:list = [4E-6, 11E-
 
 # %%
 # spare code to get apparent brightness with fire temp, recreating prof's plot
-# firefraction = np.logspace(-4,0,40) 
-# firetemp = 650
-# bgtemp = 305.273
-# averaged_power_4 = firefraction*radiatedpower(firetemp, wl = 4E-6) + (1-firefraction)*radiatedpower(bgtemp, wl = 4E-6)
-# averaged_power_11 = firefraction*radiatedpower(firetemp, wl = 11E-6) + (1-firefraction)*radiatedpower(bgtemp, wl = 11E-6)
-# fig, ax = plt.subplots(figsize = (10,7))
-# ax.plot(firefraction, brighttemp(4E-6, averaged_power_4), label = '4 microns')
-# ax.plot(firefraction, brighttemp(11E-6, averaged_power_11), label = '11 microns')
-# ax.set(xlabel = 'fire fraction', ylabel ='brightness temperature', title = f'Apparent brightness temperature at TOA, Fire temp = {firetemp}K')
-# ax.legend()
-# ax.set_xscale('log')
-# ax.grid(alpha = 0.5)
-# plt.tight_layout()
-# plt.savefig('putsomeuniquefilenamehere' dpi = 300)
-# plt.show()
+plt.rcParams.update({'font.size': 16})
+
+firefraction = np.logspace(-4,0,40) 
+firetemp = 650
+bgtemp = 305.273
+averaged_power_4 = firefraction*radiatedpower(firetemp, wl = 4E-6) + (1-firefraction)*radiatedpower(bgtemp, wl = 4E-6)
+averaged_power_11 = firefraction*radiatedpower(firetemp, wl = 11E-6) + (1-firefraction)*radiatedpower(bgtemp, wl = 11E-6)
+fig, ax = plt.subplots(figsize = (10,7))
+ax.plot(firefraction, brighttemp(4E-6, averaged_power_4), label = '4 μm')
+ax.plot(firefraction, brighttemp(11E-6, averaged_power_11), label = '11 μm')
+ax.set(xlabel = 'fire fraction', ylabel ='brightness temperature', title = f'Apparent brightness temperature at TOA, Fire temperature = {firetemp}K')
+ax.legend()
+ax.set_xscale('log')
+ax.grid(alpha = 0.8)
+plt.tight_layout()
+plt.savefig('firefraction', dpi = 300)
+plt.show()
 
 # %%
 # more spare code, thermal discrepancies plot
-
 # templist = np.linspace(300,1500)
 # v = 1E-7
-# plist4 = planck_estimate(renorm(templist, 4E-6-v), renorm(templist,4E-6+v), temp= templist, xflip= 2.0)
-# plist11 = planck_estimate(renorm(templist, 11E-6 -v), renorm(templist,11E-6 +v), temp= templist, xflip =2.0)
+# plist4 = planck_estimate(renorm(templist, 4E-6-v), renorm(templist,4E-6+v), temp= templist, xflip= 1.75, legacy = True)
+# plist11 = planck_estimate(renorm(templist, 11E-6 -v), renorm(templist,11E-6 +v), temp= templist, xflip =1.75, legacy = True)
 # bt4 = brighttemp(4E-6, plist4)
 # bt11 = brighttemp(11E-6, plist11)
 # fig, ax = plt.subplots(figsize = (10,8))
-# ax.plot(templist, (bt4-templist)/templist, label = '4 microns')
-# ax.plot(templist, (bt11-templist)/templist, label = '11 microns')
-# ax.set(xlabel = 'Absolute Temperature, K', ylabel = 'fractional error', title = r'Limit-corrected thermal discrepancies, $x_t = 2.0$')
-# ax.grid(alpha =0.5)
+# ax.plot(templist, (bt4-templist), label = '4 μm')
+# ax.plot(templist, (bt11-templist), label = '11 μm')
+# ax.set(xlabel = 'Absolute Temperature, K', ylabel = 'Absolute error', title = r'Shortwave approximation thermal discrepancies')
+# ax.grid(alpha =0.8)
 # ax.legend()
 # plt.tight_layout()
-# plt.savefig('limit_corrected_2_0.png', dpi = 300)
+# plt.savefig('sw_abs_error.png', dpi = 300)
 # plt.show()
+
+# %%
