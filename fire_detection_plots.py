@@ -36,7 +36,7 @@ if input("Save fire_spread.gif?(Y/N)\n")=="Y":
 fire_detected = [[1000,1000],[1000,1000]] # need this to draw the colors
 
 ### Pure saturation
-fire_list = np.transpose([detected_list[:,0]>400,detected_list[:,1]>700])
+fire_list = np.transpose([detected_list[:,0]>331,detected_list[:,1]>400])
 ### initialise animation
 detector_fig = plt.figure()
 im_detector = plt.imshow(fire_detected, cmap = 'coolwarm', vmin = 30, vmax = 1200)
@@ -52,42 +52,42 @@ anim_saturator = FuncAnimation(detector_fig, animate_saturator, frames=N_frames,
 if input("Save saturation detected gif?(Y/N)\n")=="Y":
   file_name = input('Name? ')
   anim_saturator.save(file_name+'.gif', writer=PillowWriter(fps=10), dpi=200)
-
-### 10 percent
-fire_list_10 = np.transpose([detected_list[:,0]>40,detected_list[:,1]>70])
-### initialise animation
-detector_fig_10 = plt.figure()
-im_detector = plt.imshow(fire_detected, cmap = 'coolwarm', vmin = 30, vmax = 1200)
-plt.vlines(0.5,-0.5,1.5,color='white',linewidth=2)
-plt.text(-0.25,1.4,'4 microns',fontsize=16,c='white')
-plt.text(.75,1.4,'11 microns',fontsize=16,c='white')
-def animate_saturator(i):
-    plt.title(f'$\\Delta t$ = {i}, Does it saturate?\nFire fraction = {firefrac_frames[i]}')
-    im_detector.set_array((-1+2*fire_list_10[i,:])*fire_detected)
-    return [im_detector]
-### start animation
-anim_10_percent = FuncAnimation(detector_fig_10, animate_saturator, frames=N_frames, repeat=False)
-if input("Save 10% saturation detected gif?(Y/N)\n")=="Y":
-  file_name = input('Name? ')
-  anim_10_percent.save(file_name+'.gif', writer=PillowWriter(fps=10), dpi=200)
-
-### 50 percent
-fire_list_50 = np.transpose([detected_list[:,0]>40,detected_list[:,1]>70])
-### initialise animation
-detector_fig_50 = plt.figure()
-im_detector = plt.imshow(fire_detected, cmap = 'coolwarm', vmin = 30, vmax = 1200)
-plt.vlines(0.5,-0.5,1.5,color='white',linewidth=2)
-plt.text(-0.25,1.4,'4 microns',fontsize=16,c='white')
-plt.text(.75,1.4,'11 microns',fontsize=16,c='white')
-def animate_saturator(i):
-    plt.title(f'$\\Delta t$ = {i}, Does it saturate?\nFire fraction = {firefrac_frames[i]}')
-    im_detector.set_array((-1+2*fire_list_50[i,:])*fire_detected)
-    return [im_detector]
-### start animation
-anim_50_percent = FuncAnimation(detector_fig_50, animate_saturator, frames=N_frames, repeat=False)
-if input("Save 50% saturation detected gif?(Y/N)\n")=="Y":
-  file_name = input('Name? ')
-  anim_50_percent.save(file_name+'.gif', writer=PillowWriter(fps=10), dpi=200)
+### 10 percent and 50 percent deprecated since they don't make sense
+##### 10 percent
+##fire_list_10 = np.transpose([detected_list[:,0]>275,detected_list[:,1]>40])
+##### initialise animation
+##detector_fig_10 = plt.figure()
+##im_detector = plt.imshow(fire_detected, cmap = 'coolwarm', vmin = 30, vmax = 1200)
+##plt.vlines(0.5,-0.5,1.5,color='white',linewidth=2)
+##plt.text(-0.25,1.4,'4 microns',fontsize=16,c='white')
+##plt.text(.75,1.4,'11 microns',fontsize=16,c='white')
+##def animate_saturator(i):
+##    plt.title(f'$\\Delta t$ = {i}, Does it saturate?\nFire fraction = {firefrac_frames[i]}')
+##    im_detector.set_array((-1+2*fire_list_10[i,:])*fire_detected)
+##    return [im_detector]
+##### start animation
+##anim_10_percent = FuncAnimation(detector_fig_10, animate_saturator, frames=N_frames, repeat=False)
+##if input("Save 10% saturation detected gif?(Y/N)\n")=="Y":
+##  file_name = input('Name? ')
+##  anim_10_percent.save(file_name+'.gif', writer=PillowWriter(fps=10), dpi=200)
+##
+##### 50 percent
+##fire_list_50 = np.transpose([detected_list[:,0]>40,detected_list[:,1]>70])
+##### initialise animation
+##detector_fig_50 = plt.figure()
+##im_detector = plt.imshow(fire_detected, cmap = 'coolwarm', vmin = 30, vmax = 1200)
+##plt.vlines(0.5,-0.5,1.5,color='white',linewidth=2)
+##plt.text(-0.25,1.4,'4 microns',fontsize=16,c='white')
+##plt.text(.75,1.4,'11 microns',fontsize=16,c='white')
+##def animate_saturator(i):
+##    plt.title(f'$\\Delta t$ = {i}, Does it saturate?\nFire fraction = {firefrac_frames[i]}')
+##    im_detector.set_array((-1+2*fire_list_50[i,:])*fire_detected)
+##    return [im_detector]
+##### start animation
+##anim_50_percent = FuncAnimation(detector_fig_50, animate_saturator, frames=N_frames, repeat=False)
+##if input("Save 50% saturation detected gif?(Y/N)\n")=="Y":
+##  file_name = input('Name? ')
+##  anim_50_percent.save(file_name+'.gif', writer=PillowWriter(fps=10), dpi=200)
 
 ### MODIS algo (making the figure was a bit weird here, different from the saturation detection since only one channel)
 fire_list_modis = np.vectorize(modis4_detect)(detected_list[:,0], detected_list[:,1]).astype(int)
